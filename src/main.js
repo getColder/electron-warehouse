@@ -4,8 +4,11 @@ import ElementUi from 'element-ui'
 import router from '../router'
 import 'element-ui/lib/theme-chalk/index.css'
 import store from '../store'
+import http from "axios"
+import '../api/mock.js'
 
 Vue.use(ElementUi);
+Vue.prototype.$http = http;
 Vue.config.productionTip = false;
 
 new Vue({
