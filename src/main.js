@@ -7,8 +7,8 @@ import store from '../store'
 import http from "axios"
 import '../api/mock.js'
 
-Vue.use(ElementUi);
-Vue.prototype.$http = http;
+Vue.use(ElementUi);                 //ElementUi组件库引入
+Vue.prototype.$http = http;         //axio封装
 Vue.config.productionTip = false;
 
 new Vue({

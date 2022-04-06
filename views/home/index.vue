@@ -178,7 +178,7 @@ export default {
                   opacity: 0.6,
                   borderWidth: 3,
                   borderType: "solid",
-                  barBorderRadius: 3,
+                  borderRadius: 3,
                   shadowBlur: 3,
                 },
               },
