@@ -17,11 +17,20 @@ const routes = [
                 name: 'user',
                 component: () =>import('../views/user')
             },
-            ,
             {
                 path: '/warehouse',
                 name: 'warehouse',
                 component: () =>import('../views/warehouse')
+            },
+            {
+                path: '/page1',
+                name: 'page1',
+                component: () =>import('../views/other/pageOne')
+            },
+            {
+                path: '/page2',
+                name: 'page2',
+                component: () =>import('../views/other/pageTwo')
             }
         ]
     }

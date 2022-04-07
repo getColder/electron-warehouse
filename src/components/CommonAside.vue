@@ -31,6 +31,7 @@
         v-for="item in child.children"
         :index="item.path"
         :key="item.path"
+        @click="clickMenu(item)"
         >{{ item.label }}</el-menu-item
       >
     </el-submenu>
@@ -117,6 +118,7 @@ export default {
       this.$router.push({
         name: item.name,
       });
+      this.$store.commit('selectMenu', item)
     },
   },
   computed: {
