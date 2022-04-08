@@ -62,49 +62,7 @@ export default {
   data() {
     return {
       title: "仓库后台管理",
-      menu: [
-        {
-          path: "/",
-          name: "home",
-          label: "首页",
-          icon: "s-home",
-          url: "Home/Home",
-        },
-        {
-          path: "/warehouse",
-          name: "warehouse",
-          label: "仓库",
-          icon: "s-shop",
-          url: "warehouse/warehouse",
-        },
-        {
-          path: "/user",
-          name: "user",
-          label: "用户管理",
-          icon: "user",
-          url: "userManage/userManage",
-        },
-        {
-          label: "其他",
-          icon: "location",
-          children: [
-            {
-              path: "/page1",
-              name: "page1",
-              label: "页面1",
-              icon: "setting",
-              url: "Other/PageOne",
-            },
-            {
-              path: "/page2",
-              name: "page2",
-              label: "页面2",
-              icon: "setting",
-              url: "Other/PageTwo",
-            },
-          ],
-        },
-      ],
+      menu: [],
     };
   },
   methods: {
@@ -118,19 +76,22 @@ export default {
       this.$router.push({
         name: item.name,
       });
-      this.$store.commit('selectMenu', item)
+      this.$store.commit('selectMenu', item);
     },
   },
   computed: {
     noChildren() {
-      return this.menu.filter((item) => !item.children);
+      return this.asyncMenu.filter((item) => !item.children);
     },
     hasChildren() {
-      return this.menu.filter((item) => item.children);
+      return this.asyncMenu.filter((item) => item.children);
     },
     isCollapse() {
       return this.$store.state.tab.isCollapse;
     },
+    asyncMenu(){
+        return this.$store.state.tab.menu;
+    }
   },
 };
 </script>

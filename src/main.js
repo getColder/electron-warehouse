@@ -11,6 +11,17 @@ Vue.use(ElementUi);                 //ElementUi组件库引入
 Vue.prototype.$http = http;         //axio封装
 Vue.config.productionTip = false;
 
+router.beforeEach((to, form, next) => {
+    store.commit('getToken');
+    const token = store.state.user.token;
+    if (!token && to.name !== 'login') {
+        next({ name: 'login' });
+    }
+    else {
+        next();
+    }
+})
+
 new Vue({
     store,
     router,
