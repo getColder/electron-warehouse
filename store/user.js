@@ -8,7 +8,7 @@ export default {
             state.token = val;
             Cookie.set('token', val);
         },
-        clearCookie(state) {
+        clearToken(state) {
             state.token = "";
             Cookie.remove('token');
         },

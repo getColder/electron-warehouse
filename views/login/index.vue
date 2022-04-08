@@ -39,8 +39,6 @@
 <script>
 import Mock from "mockjs";
 import { getMenu } from "../../api/data";
-import { routes } from "../../router/index";
-console.log(routes);
 
 export default {
     name: "login",
