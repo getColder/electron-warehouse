@@ -40,7 +40,9 @@ class HttpRequest
     //请求接口
     request(options) {
         const instance = axios.create();
+        console.log(this.getInsideConfig());
         options = {...this.getInsideConfig(), ...options};
+        console.log(options);
         this.interceptors(instance);
         return instance(options);
     }
