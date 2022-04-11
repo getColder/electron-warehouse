@@ -245,6 +245,7 @@ export default {
               },
             ],
           };
+          //展示出入库-折线图
           const S = echarts.init(this.$refs.itemStockChart);
           S.setOption(itemStockOption);
         }

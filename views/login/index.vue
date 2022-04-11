@@ -1,39 +1,39 @@
 <template>
-    <el-card class="login-container">
-        <el-form
-            :model="form"
-            status-icon
-            :rules="rules"
-            ref="form"
-            label-width="“100px”"
+  <el-card class="login-container">
+    <el-form
+      :model="form"
+      status-icon
+      :rules="rules"
+      ref="form"
+      label-width="“100px”"
+    >
+      <h3 class="login_title">系统登陆</h3>
+      <el-form-item
+        label="用户名"
+        label-width="80px"
+        prop="username"
+        class="username"
+      >
+        <el-input
+          type="input"
+          v-model="form.username"
+          placeholder="请输入账号"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="密码" label-width="80px" prop="password">
+        <el-input
+          type="password"
+          v-model="form.password"
+          placeholder="请输入密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item class="login_submit">
+        <el-button type="primary" @click="login" class="login-submit"
+          >登录</el-button
         >
-            <h3 class="login_title">系统登陆</h3>
-            <el-form-item
-                label="用户名"
-                label-width="80px"
-                prop="username"
-                class="username"
-            >
-                <el-input
-                    type="input"
-                    v-model="form.username"
-                    placeholder="请输入账号"
-                ></el-input>
-            </el-form-item>
-            <el-form-item label="密码" label-width="80px" prop="password">
-                <el-input
-                    type="password"
-                    v-model="form.password"
-                    placeholder="请输入密码"
-                ></el-input>
-            </el-form-item>
-            <el-form-item class="login_submit">
-                <el-button type="primary" @click="login" class="login-submit"
-                    >登录</el-button
-                >
-            </el-form-item>
-        </el-form>
-    </el-card>
+      </el-form-item>
+    </el-form>
+  </el-card>
 </template>
 
 <script>
@@ -83,20 +83,20 @@ export default {
                     this.$message.warning("密码或账户错误！");
                 }
             });
-        },
     },
+  },
 };
 </script>
 
 <style lang="less" scoped>
 .login-container {
+  position: relative;
+  width: 550px;
+  margin: 50px auto;
+  border: 1px solid #eee;
+  .login-submit {
     position: relative;
-    width: 550px;
-    margin: 50px auto;
-    border: 1px solid #eee;
-    .login-submit {
-        position: relative;
-        left: 85%;
-    }
+    left: 85%;
+  }
 }
 </style>
