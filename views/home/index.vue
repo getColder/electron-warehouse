@@ -249,8 +249,6 @@ export default {
           const S = echarts.init(this.$refs.itemStockChart);
           S.setOption(itemStockOption);
         }
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err, "错误");

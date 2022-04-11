@@ -1,7 +1,12 @@
 <template>
     <div class="common-table">
         <el-card class="table-view">
-            <el-table class="table-body-view" :data="tableData" height="90%" stripe>
+            <el-table
+                class="table-body-view"
+                :data="tableData"
+                height="90%"
+                stripe
+            >
                 <el-table-column
                     show-overflow-tooltip
                     v-for="item in tableLabel"
@@ -17,15 +22,20 @@
                         }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" header-align="center" align="center" min-width="180">
-                    <el-button size="mini" @click="handleEdit">编辑</el-button>
+                <el-table-column
+                    label="操作"
+                    header-align="center"
+                    align="center"
+                    min-width="180"
+                >
+                    <el-button size="mini" @click="handleEdit" type="primary">编辑</el-button>
                     <el-button size="mini" type="warning" @click="handleDelete"
                         >删除</el-button
                     >
-                    <el-button size="mini" @click="handleEdit" type="primay"
+                    <el-button size="mini" @click="handleStockin"
                         >入库</el-button
                     >
-                    <el-button size="mini" @click="handleEdit" type="primay"
+                    <el-button size="mini" @click="handleStockOut" 
                         >出库</el-button
                     >
                 </el-table-column>
@@ -59,6 +69,12 @@ export default {
         },
         handleDelete(row) {
             this.$emit("delete", row);
+        },
+        handleStockin(row) {
+            this.$emit("stockin", row);
+        },
+        handleStockOut(row) {
+            this.$emit("stockout", row);
         },
         changePage(page) {
             this.$emit("changePage", page);

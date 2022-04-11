@@ -14,13 +14,6 @@
         v-if="item.type === 'switch'"
         v-model="form[item.model]"
       ></el-switch>
-      <el-date-picker
-        v-if="item.type === 'date'"
-        type="date"
-        value-format="yyyy-MM-dd"
-        placeholder="选择日期"
-        v-model="form[item.model]"
-      ></el-date-picker>
       <el-select
         v-if="item.type === 'select'"
         placeholder="请选择"

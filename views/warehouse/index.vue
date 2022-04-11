@@ -20,7 +20,7 @@
                 type="success"
                 size="mini"
                 style="margin-bottom: 20px"
-                @click="addItem"
+                @click="addItemDialog"
                 >新增项目</el-button
             >
             <common-form
@@ -36,8 +36,10 @@
             :tableLabel="tableLabel"
             :config="config"
             @changePage="getList()"
-            @edit="editItem()"
-            @delete="deleteItem()"
+            @edit="editItemDialog(row)"
+            @delete="remove(row)"
+            @stockin="stockin(row)"
+            @stockout="stockout(row)"
         >
         </common-table>
     </div>
@@ -53,9 +55,15 @@
 </style>
 
 <script>
-import { Model } from "echarts";
 import CommonForm from "../../src/components/CommonForm.vue";
 import CommonTable from "../../src/components/CommonTable.vue";
+import {
+    createItem,
+    updateItem,
+    deleteItem,
+    stockInItem,
+    stockOutItem,
+} from "../../api/data";
 
 export default {
     name: "warehouse",
@@ -145,22 +153,107 @@ export default {
     methods: {
         confirm() {
             if (this.operateType === "add") {
-                this.$http.post("/warehouse/add", this.operateForm, (res) => {
-                    console.log(res);
-                    this.isShow = false;
-                });
+                this.create();
             } else if (this.operateType === "edit") {
-                this.$http.post("/warehouse/edit", this.operateForm, (res) => {
-                    console.log(res);
-                    this.isShow = false;
-                });
+                this.edit();
             }
         },
-        addItem() {
+        addItemDialog() {
             this.isShow = true;
             this.operateType = "add";
         },
-        getList() {},
+        editItemDialog(row) {
+            this.isShow = true;
+            this.operateType = "edit";
+        },
+        create(param) {
+            createItem(this.operateForm)
+                .then((res) => {
+                    const { code, data } = res.data;
+                    if (code === 20000) {
+                        this.$message.success("添加成功！");
+                    } else if (code === 20001) {
+                        this.$message.warning("项目已存在!");
+                    } else {
+                        this.$message.error("添加失败！");
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error("添加失败！");
+                    console.log(err, "错误");
+                });
+        },
+        edit(param) {
+            updateItem(this.operateForm)
+                .then((res) => {
+                    const { code, data } = res.data;
+                    if (code === 20000) {
+                        this.$message.success("修改成功！");
+                    } else if (code === 20001) {
+                        this.$message.warning("项目不存在!");
+                    } else {
+                        this.$message.error("修改失败！");
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error("修改失败！");
+                    console.log(err, "错误");
+                });
+        },
+        remove(row) {
+            console.log(row);
+            deleteItem(row)
+                .then((res) => {
+                    const { code, data } = res.data;
+                    if (code === 20000) {
+                        this.$message.success("删除成功！");
+                    } else if (code === 20001) {
+                        this.$message.warning("项目不存在!删除失败！");
+                    } else {
+                        this.$message.error("删除失败！");
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error("删除失败！");
+                    console.log(err, "错误");
+                });
+        },
+        stockin(row) {
+            console.log(row);
+            stockInItem(row)
+                .then((res) => {
+                    const { code, data } = res.data;
+                    if (code === 20000) {
+                        this.$message.success("入库成功！");
+                    } else if (code === 20001) {
+                        this.$message.warning("入库失败 ");
+                    } else {
+                        this.$message.error("入库失败！");
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error("入库失败！");
+                    console.log(err, "错误");
+                });
+        },
+        stockout(row) {
+            console.log(row);
+            stockOutItem(row)
+                .then((res) => {
+                    const { code, data } = res.data;
+                    if (code === 20000) {
+                        this.$message.success("出库成功！");
+                    } else if (code === 20001) {
+                        this.$message.warning("出库失败！库存不足！ ");
+                    } else {
+                        this.$message.error("出库失败！");
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error("出库失败！");
+                    console.log(err, "错误");
+                });
+        },
     },
 };
 </script>

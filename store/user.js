@@ -6,11 +6,11 @@ export default {
     mutations: {
         setToken(state, val) {
             state.token = val;
-            Cookie.set('token', val);
+            localStorage.setItem("very", val);
         },
         clearToken(state) {
             state.token = "";
-            Cookie.remove('token');
+            localStorage.setItem("very", "");
         },
         getToken(state) {
             state.token = state.token || Cookie.get('token');
