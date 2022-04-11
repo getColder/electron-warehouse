@@ -13,7 +13,9 @@ class HttpRequest
     getInsideConfig(){
         const config = {
             baseUrl: this.baseUrl,
-            header: {}
+            headers: {
+                'Authorization' : 'Not me',
+            }
         }
         return config;
     }
