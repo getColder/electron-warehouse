@@ -36,10 +36,10 @@
             :tableLabel="tableLabel"
             :config="config"
             @changePage="getList()"
-            @edit="editItemDialog(row)"
-            @delete="remove(row)"
-            @stockin="stockin(row)"
-            @stockout="stockout(row)"
+            @edit="editItemDialog"
+            @delete="remove"
+            @stockin="stockin"
+            @stockout="stockout"
         >
         </common-table>
     </div>
@@ -65,6 +65,7 @@ import {
     stockOutItem,
 } from "../../api/data";
 
+import { getData } from "../../api/data.js";
 export default {
     name: "warehouse",
     components: {
@@ -74,6 +75,7 @@ export default {
     data() {
         return {
             operateType: "add",
+            operateRow: [],
             isShow: false,
             operateFormLabel: [
                 {
@@ -96,7 +98,7 @@ export default {
                     label: "分组",
                     type: "select",
                     opts: [
-                        { label: "分组1", value: "g1" },
+                        { label: "分组1", value: "g55" },
                         { label: "分组2", value: "g2" },
                     ],
                 },
@@ -104,7 +106,8 @@ export default {
             operateForm: {
                 name: "",
                 number: "",
-                psc: "",
+                pcs: "",
+                group: "",
             },
             formLabel: [
                 {
@@ -118,7 +121,7 @@ export default {
             },
             tableLabel: [
                 {
-                    prop: "item",
+                    prop: "name",
                     label: "项目名称",
                     width: "250",
                 },
@@ -138,12 +141,7 @@ export default {
                     width: "250",
                 },
             ],
-            tableData: Array(40).fill({
-                item: "物品1",
-                number: "5",
-                pcs: "个",
-                group: "分组1",
-            }),
+            tableData: [],
             config: {
                 page: 1,
                 total: 20,
@@ -155,7 +153,7 @@ export default {
             if (this.operateType === "add") {
                 this.create();
             } else if (this.operateType === "edit") {
-                this.edit();
+                this.edit(this.operateRow.name);
             }
         },
         addItemDialog() {
@@ -163,15 +161,20 @@ export default {
             this.operateType = "add";
         },
         editItemDialog(row) {
+            this.operateRow = row;
             this.isShow = true;
             this.operateType = "edit";
         },
-        create(param) {
+        create() {
             createItem(this.operateForm)
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("添加成功！");
+                        getData().then((res) => {
+                            const { data, code } = res.data;
+                            if (code === 20000) this.tableData = data.tableData;
+                        });
                     } else if (code === 20001) {
                         this.$message.warning("项目已存在!");
                     } else {
@@ -183,12 +186,20 @@ export default {
                     console.log(err, "错误");
                 });
         },
-        edit(param) {
+        edit(itemName) {
+            this.operateForm.oldName = itemName;
             updateItem(this.operateForm)
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("修改成功！");
+                        setTimeout(() => {
+                            getData().then((res) => {
+                                const { data, code } = res.data;
+                                if (code === 20000)
+                                    this.tableData = data.tableData;
+                            });
+                        }, 500);
                     } else if (code === 20001) {
                         this.$message.warning("项目不存在!");
                     } else {
@@ -201,14 +212,18 @@ export default {
                 });
         },
         remove(row) {
-            console.log(row);
-            deleteItem(row)
+            this.operateRow = row;
+            deleteItem({ name: this.operateRow.name })
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("删除成功！");
+                        getData().then((res) => {
+                            const { data, code } = res.data;
+                            if (code === 20000) this.tableData = data.tableData;
+                        });
                     } else if (code === 20001) {
-                        this.$message.warning("项目不存在!删除失败！");
+                        this.$message.warning("项目不存在!");
                     } else {
                         this.$message.error("删除失败！");
                     }
@@ -218,15 +233,15 @@ export default {
                     console.log(err, "错误");
                 });
         },
-        stockin(row) {
-            console.log(row);
-            stockInItem(row)
+        stockin(row, _mount = 1) {
+            this.operateRow = row;
+            stockInItem({ name: this.operateRow.name, mount: _mount })
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("入库成功！");
                     } else if (code === 20001) {
-                        this.$message.warning("入库失败 ");
+                        this.$message.warning("项目不存在! ");
                     } else {
                         this.$message.error("入库失败！");
                     }
@@ -236,15 +251,17 @@ export default {
                     console.log(err, "错误");
                 });
         },
-        stockout(row) {
-            console.log(row);
-            stockOutItem(row)
+        stockout(row, _mount = 1) {
+            this.operateRow = row;
+            stockOutItem({ name: this.operateRow.name, mount: _mount })
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("出库成功！");
                     } else if (code === 20001) {
-                        this.$message.warning("出库失败！库存不足！ ");
+                        this.$message.warning("项目不存在 ");
+                    } else if (code === 20002) {
+                        this.$message.warning("库存不足!");
                     } else {
                         this.$message.error("出库失败！");
                     }
@@ -254,6 +271,12 @@ export default {
                     console.log(err, "错误");
                 });
         },
+    },
+    mounted() {
+        getData().then((res) => {
+            const { data, code } = res.data;
+            if (code === 20000) this.tableData = data.tableData;
+        });
     },
 };
 </script>

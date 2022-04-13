@@ -6,6 +6,8 @@
                 :data="tableData"
                 height="90%"
                 stripe
+                fit
+                row-key
             >
                 <el-table-column
                     show-overflow-tooltip
@@ -15,6 +17,9 @@
                     :width="item.width ? item.width : 125"
                     header-align="center"
                     align="center"
+                    sortable="true"
+                    show-overflow-tooltip="true"
+           
                 >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{
@@ -28,16 +33,26 @@
                     align="center"
                     min-width="180"
                 >
-                    <el-button size="mini" @click="handleEdit" type="primary">编辑</el-button>
-                    <el-button size="mini" type="warning" @click="handleDelete"
-                        >删除</el-button
-                    >
-                    <el-button size="mini" @click="handleStockin"
-                        >入库</el-button
-                    >
-                    <el-button size="mini" @click="handleStockOut" 
-                        >出库</el-button
-                    >
+                    <template slot-scope="scope">
+                        <el-button
+                            size="mini"
+                            @click="handleEdit(scope.row)"
+                            type="primary"
+                            >编辑</el-button
+                        >
+                        <el-button
+                            size="mini"
+                            type="warning"
+                            @click="handleDelete(scope.row)"
+                            >删除</el-button
+                        >
+                        <el-button size="mini" @click="handleStockin(scope.row)"
+                            >入库</el-button
+                        >
+                        <el-button size="mini" @click="handleStockOut(scope.row)"
+                            >出库</el-button
+                        >
+                    </template>
                 </el-table-column>
             </el-table>
             <el-pagination
@@ -56,7 +71,8 @@
 export default {
     name: "CommonTable",
     data() {
-        return {};
+        return {
+        };
     },
     props: {
         tableData: Array,
@@ -65,7 +81,7 @@ export default {
     },
     methods: {
         handleEdit(row) {
-            this.$emit("edit", row);
+            this.$emit("edit",  row);
         },
         handleDelete(row) {
             this.$emit("delete", row);

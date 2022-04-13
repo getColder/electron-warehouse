@@ -57,7 +57,6 @@ export default{
                 }
             });
             //路由的动态添加
-            console.log(menuArray);
             menuArray.forEach(item => {
                 router.addRoute('Main', item);
             })

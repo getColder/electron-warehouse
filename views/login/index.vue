@@ -73,11 +73,11 @@ export default {
             getMenu(this.form)
                 .then((res) => {
                     if (res.data.code === 20000) {
-                        console.log(res.headers.authorization);
                         this.$store.commit("clearMenu");
                         this.$store.commit("clearToken");
                         this.$store.commit("setMenu", res.data.menu);
                         this.$store.commit("setToken", res.headers.authorization);
+                        localStorage.setItem(res.headers.authorization);
                         this.$store.commit("addMenu", this.$router);
                         this.$router.push({ name: "home" });
                     } else {

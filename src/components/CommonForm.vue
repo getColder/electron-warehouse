@@ -10,10 +10,6 @@
         :placeholder="'请输入' + item.label"
         v-model="form[item.model]"
       ></el-input>
-      <el-switch
-        v-if="item.type === 'switch'"
-        v-model="form[item.model]"
-      ></el-switch>
       <el-select
         v-if="item.type === 'select'"
         placeholder="请选择"

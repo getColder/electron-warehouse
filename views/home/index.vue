@@ -93,7 +93,7 @@
 
 
 <script>
-import { getMenu, getData } from "../../api/data.js";
+import { getData } from "../../api/data.js";
 import * as echarts from "echarts";
 
 export default {

@@ -13,7 +13,7 @@ export default {
             localStorage.setItem("very", "");
         },
         getToken(state) {
-            state.token = state.token || Cookie.get('token');
+            state.token = state.token || localStorage.getItem('very');
         }
     }
 }
