@@ -37,8 +37,7 @@
 </template>
 
 <script>
-import Mock from "mockjs";
-import { getMenu, setHeader } from "../../api/data";
+import { getMenu} from "../../api/data";
 
 export default {
     name: "login",
@@ -85,7 +84,7 @@ export default {
                     }
                 })
                 .catch((e) => {
-                    this.$message.warning("密码或账户错误！");
+                    this.$message.warning("密码或账户错误！",e);
                 });
         },
     },

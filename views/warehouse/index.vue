@@ -1,5 +1,29 @@
 <template>
     <div class="manager">
+        <el-dialog title="警告" :visible.sync="confirmDeleteShow">
+            <span style="font-size: 1.4rem"
+                >项目删除后不可恢复! 你确认要删除吗？</span
+            >
+            <div slot="footer" class="dialog-foot">
+                <el-button @click="confirmDeleteShow = false">取消</el-button>
+                <el-button type="danger" @click="confirm">确认</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog :title="'库存管理'" :visible.sync="stockShow" center="true">
+            <div style="font-size: 1.2rem; margin: auto; text-align: center">
+                {{ operateType === "stockin" ? "入库" : "出库" }}数量：
+                <el-input-number
+                    v-model="stockMount"
+                    :min="1"
+                    :step="this.factor + 1 + this.factor * 2"
+                    controls-position="right"
+                ></el-input-number>
+            </div>
+            <div slot="footer" class="dialog-foot">
+                <el-button @click="stockShow = false">取消</el-button>
+                <el-button type="success" @click="confirm">确认</el-button>
+            </div>
+        </el-dialog>
         <el-dialog
             :title="operateType === 'add' ? '新增项目' : '更改项目'"
             :visible.sync="isShow"
@@ -15,14 +39,37 @@
                 <el-button type="primary" @click="confirm">确认</el-button>
             </div>
         </el-dialog>
+        <el-dialog :title="'分组命名'" :visible.sync="groupShow" center="true">
+            <common-form
+                :formLabel="groupFormLabel"
+                :form="groupForm"
+                :inline="true"
+                ref="form"
+            ></common-form>
+            <div slot="footer" class="dialog-foot">
+                <el-button @click="groupShow = false">取消</el-button>
+                <el-button type="success" @click="confirm">确认</el-button>
+            </div>
+        </el-dialog>
         <div class="manager-header">
-            <el-button
-                type="success"
-                size="mini"
-                style="margin-bottom: 20px"
-                @click="addItemDialog"
-                >新增项目</el-button
-            >
+            <div>
+                <el-button
+                    type="success"
+                    size="medium"
+                    style="margin-bottom: 20px"
+                    icon="el-icon-plus"
+                    @click="addItemDialog"
+                    >新增项目</el-button
+                >
+                <el-button
+                    type="primary"
+                    size="medium"
+                    style="margin-bottom: 20px"
+                    icon="el-icon-paperclip"
+                    @click="groupEditDialog"
+                    >分组命名</el-button
+                >
+            </div>
             <common-form
                 :formLabel="formLabel"
                 :form="searchForm"
@@ -37,15 +84,15 @@
             :config="config"
             @changePage="getList()"
             @edit="editItemDialog"
-            @delete="remove"
-            @stockin="stockin"
-            @stockout="stockout"
+            @delete="deleteDialog"
+            @stockin="stockinDialog"
+            @stockout="stockoutDialog"
         >
         </common-table>
     </div>
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 .manager {
     .manager-header {
         display: flex;
@@ -58,14 +105,14 @@
 import CommonForm from "../../src/components/CommonForm.vue";
 import CommonTable from "../../src/components/CommonTable.vue";
 import {
+    getData,
+    getGroupList,
     createItem,
     updateItem,
     deleteItem,
     stockInItem,
     stockOutItem,
 } from "../../api/data";
-
-import { getData } from "../../api/data.js";
 export default {
     name: "warehouse",
     components: {
@@ -76,7 +123,11 @@ export default {
         return {
             operateType: "add",
             operateRow: [],
+            stockMount: 1,
             isShow: false,
+            confirmDeleteShow: false,
+            stockShow: false,
+            groupShow: false,
             operateFormLabel: [
                 {
                     model: "name",
@@ -101,6 +152,28 @@ export default {
                         { label: "分组1", value: "g55" },
                         { label: "分组2", value: "g2" },
                     ],
+                },
+            ],
+            groupFormLabel: [
+                {
+                    model: "group1",
+                    label: "组一",
+                    type: "input",
+                },
+                {
+                    model: "group2",
+                    label: "组二",
+                    type: "input",
+                },
+                {
+                    model: "group3",
+                    label: "组三",
+                    type: "input",
+                },
+                {
+                    model: "group4",
+                    label: "组四",
+                    type: "input",
                 },
             ],
             operateForm: {
@@ -141,7 +214,13 @@ export default {
                     width: "250",
                 },
             ],
-            tableData: [],
+            groupForm: {
+                group1: "X",
+                group2: "Y",
+                group3: "Z",
+                group4: "U",
+            },
+            tableData: [{ name: "物品1", number: 50, pcs: "个", group: "组1" }],
             config: {
                 page: 1,
                 total: 20,
@@ -153,17 +232,54 @@ export default {
             if (this.operateType === "add") {
                 this.create();
             } else if (this.operateType === "edit") {
-                this.edit(this.operateRow.name);
+                this.edit(this.operateRow);
+            } else if (this.operateType === "delete") {
+                this.remove(this.operateRow);
+            } else if (this.operateType === "stockin") {
+                this.stockin(this.operateRow, this.stockMountInt);
+            } else if (this.operateType === "stockout") {
+                this.stockout(this.operateRow, this.stockMountInt);
+            } else if (this.operateType === "groupShow") {
+                this.submitGroupList();
             }
+            this.isShow = false;
+            this.groupShow = false;
+            this.stockShow = false;
+            this.confirmDeleteShow = false;
         },
         addItemDialog() {
             this.isShow = true;
             this.operateType = "add";
         },
+        groupEditDialog() {
+            this.groupShow = true;
+            this.operateType = "groupEdit";
+        },
+        stockinDialog(row) {
+            this.operateRow = row;
+            this.operateType = "stockin";
+            this.stockShow = true;
+        },
+        stockoutDialog(row) {
+            this.operateRow = row;
+            this.operateType = "stockout";
+            this.stockShow = true;
+        },
         editItemDialog(row) {
             this.operateRow = row;
+            this.operateForm = {
+                name: this.operateRow.name,
+                number: this.operateRow.number,
+                pcs: this.operateRow.pcs,
+                group: this.operateRow.group,
+            };
             this.isShow = true;
             this.operateType = "edit";
+        },
+        deleteDialog(row) {
+            this.operateRow = row;
+            this.confirmDeleteShow = true;
+            this.operateType = "delete";
         },
         create() {
             createItem(this.operateForm)
@@ -171,10 +287,7 @@ export default {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("添加成功！");
-                        getData().then((res) => {
-                            const { data, code } = res.data;
-                            if (code === 20000) this.tableData = data.tableData;
-                        });
+                        this.tableData = data.tableData;
                     } else if (code === 20001) {
                         this.$message.warning("项目已存在!");
                     } else {
@@ -186,20 +299,14 @@ export default {
                     console.log(err, "错误");
                 });
         },
-        edit(itemName) {
-            this.operateForm.oldName = itemName;
+        edit(row) {
+            this.operateForm.oldName = row.name;
             updateItem(this.operateForm)
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("修改成功！");
-                        setTimeout(() => {
-                            getData().then((res) => {
-                                const { data, code } = res.data;
-                                if (code === 20000)
-                                    this.tableData = data.tableData;
-                            });
-                        }, 500);
+                        this.tableData = data.tableData;
                     } else if (code === 20001) {
                         this.$message.warning("项目不存在!");
                     } else {
@@ -212,16 +319,12 @@ export default {
                 });
         },
         remove(row) {
-            this.operateRow = row;
-            deleteItem({ name: this.operateRow.name })
+            deleteItem({ name: row.name })
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("删除成功！");
-                        getData().then((res) => {
-                            const { data, code } = res.data;
-                            if (code === 20000) this.tableData = data.tableData;
-                        });
+                        this.tableData = data.tableData;
                     } else if (code === 20001) {
                         this.$message.warning("项目不存在!");
                     } else {
@@ -234,14 +337,15 @@ export default {
                 });
         },
         stockin(row, _mount = 1) {
-            this.operateRow = row;
-            stockInItem({ name: this.operateRow.name, mount: _mount })
+            stockInItem({ name: row.name, mount: _mount })
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("入库成功！");
+                        this.tableData = data.tableData;
                     } else if (code === 20001) {
                         this.$message.warning("项目不存在! ");
+                        this.tableData = data.tableData;
                     } else {
                         this.$message.error("入库失败！");
                     }
@@ -252,12 +356,12 @@ export default {
                 });
         },
         stockout(row, _mount = 1) {
-            this.operateRow = row;
-            stockOutItem({ name: this.operateRow.name, mount: _mount })
+            stockOutItem({ name: row.name, mount: _mount })
                 .then((res) => {
                     const { code, data } = res.data;
                     if (code === 20000) {
                         this.$message.success("出库成功！");
+                        this.tableData = data.tableData;
                     } else if (code === 20001) {
                         this.$message.warning("项目不存在 ");
                     } else if (code === 20002) {
@@ -277,6 +381,21 @@ export default {
             const { data, code } = res.data;
             if (code === 20000) this.tableData = data.tableData;
         });
+        getGroupList().then((res) => {
+            const { data, code } = res.data;
+            if (code === 20000) this.groupForm = data.groupData;
+        });
+    },
+    computed: {
+        factor() {
+            return Math.ceil(this.stockMount / 50) - 1;
+        },
+        stockMountInt() {
+            if (typeof this.stockMount !== "number") {
+                return 0;
+            }
+            return Math.floor(this.stockMount);
+        },
     },
 };
 </script>

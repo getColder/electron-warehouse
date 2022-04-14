@@ -32,7 +32,7 @@ export default{
             state.menu = val;
             Cookie.set('menu', JSON.stringify(val));
         },
-        clearMenu(state, val) {
+        clearMenu(state) {
             state.menu = [];
             Cookie.remove('menu');
         },

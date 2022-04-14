@@ -1,14 +1,4 @@
 import axios from "./axios";
-let headers = {};
-
-/**
- * 
- * @param {string} h : header{key: value} 
- */
-export const setHeader = (h) => {
-    headers = h;
-}
-
 export const getMenu = (param) => {
     return axios.request({
         url: "/permission/getMenu",
@@ -17,6 +7,21 @@ export const getMenu = (param) => {
         headers: { 'Authorization': localStorage.getItem('very')}
     })
 }
+
+export const getGroupList = () => {
+    return axios.request({
+        url: '/groups/getGroupList',
+        headers: { 'Authorization': localStorage.getItem('very') }
+    })
+}
+
+export const getGroup = () => {
+    return axios.request({
+        url: '/groups/getGroup',
+        headers: { 'Authorization': localStorage.getItem('very') }
+    })
+}
+
 
 export const getData = () => {
     return axios.request({

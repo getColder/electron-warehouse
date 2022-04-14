@@ -3,8 +3,8 @@
         <el-card class="table-view">
             <el-table
                 class="table-body-view"
-                :data="tableData"
-                height="90%"
+                :data="localTableData"
+                height="60vh"
                 stripe
                 fit
                 row-key
@@ -18,8 +18,6 @@
                     header-align="center"
                     align="center"
                     sortable="true"
-                    show-overflow-tooltip="true"
-           
                 >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{
@@ -42,14 +40,16 @@
                         >
                         <el-button
                             size="mini"
-                            type="warning"
+                            type="danger"
                             @click="handleDelete(scope.row)"
                             >删除</el-button
                         >
                         <el-button size="mini" @click="handleStockin(scope.row)"
                             >入库</el-button
                         >
-                        <el-button size="mini" @click="handleStockOut(scope.row)"
+                        <el-button
+                            size="mini"
+                            @click="handleStockOut(scope.row)"
                             >出库</el-button
                         >
                     </template>
@@ -58,8 +58,8 @@
             <el-pagination
                 class="pager"
                 layout="prev, pager, next"
-                :total="config.total"
-                :current-page.sync="config.page"
+                :total="localConfig.total"
+                :current-page="localConfig.page"
                 @current-page="changePage"
                 :page-size="20"
             ></el-pagination>
@@ -72,6 +72,8 @@ export default {
     name: "CommonTable",
     data() {
         return {
+            localConfig: this.config,
+            localTableData: this.tableData
         };
     },
     props: {
@@ -81,7 +83,7 @@ export default {
     },
     methods: {
         handleEdit(row) {
-            this.$emit("edit",  row);
+            this.$emit("edit", row);
         },
         handleDelete(row) {
             this.$emit("delete", row);
@@ -96,13 +98,16 @@ export default {
             this.$emit("changePage", page);
         },
     },
+    watch: {
+        tableData: function(val) {
+            this.localTableData = val;
+        },
+    },
 };
 </script>
 
 <style lang="less">
 .common-table {
-    height: calc(100% - 62px);
-    background: #ff0;
     .table-view {
         text-align: center;
         .pager {
