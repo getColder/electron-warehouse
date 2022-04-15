@@ -15,6 +15,16 @@ export const getGroupList = () => {
     })
 }
 
+export const submitGroupList = (param) => {
+    return axios.request({
+        url: '/groups/submitGroupList',
+        method: "post",
+        data: param,
+        headers: { 'Authorization': localStorage.getItem('very') }
+    })
+}
+
+
 export const getGroup = () => {
     return axios.request({
         url: '/groups/getGroup',
