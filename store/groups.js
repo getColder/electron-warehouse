@@ -22,6 +22,7 @@ export default {
     mutations: {
         getGroup(state, val) {
             state.groupsInfo = val;
+            
         },
     }
 }

@@ -1,4 +1,3 @@
-import Cookie from 'js-cookie'
 export default{
     state: {
         isCollapse: true,
@@ -30,17 +29,17 @@ export default{
         },
         setMenu(state, val) {
             state.menu = val;
-            Cookie.set('menu', JSON.stringify(val));
+            localStorage.setItem('menu', JSON.stringify(val));
         },
         clearMenu(state) {
             state.menu = [];
-            Cookie.remove('menu');
+            localStorage.removeItem('menu')
         },
         addMenu(state, router) {
-            if(!Cookie.get('menu')) {
+            if(!localStorage.getItem('menu')) {
                 return;
             }
-            const menu = JSON.parse(Cookie.get('menu'));
+            const menu = JSON.parse(localStorage.getItem('menu'));
             state.menu = menu;
             const menuArray = [];
             menu.forEach(item => {

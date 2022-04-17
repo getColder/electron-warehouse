@@ -5,8 +5,12 @@
         >项目删除后不可恢复! 你确认要删除吗？</span
       >
       <div slot="footer" class="dialog-foot">
-        <el-button @click="confirmDeleteShow = false">取消</el-button>
-        <el-button type="danger" @click="confirm">确认</el-button>
+        <el-button :disabled="submitting" @click="confirmDeleteShow = false"
+          >取消</el-button
+        >
+        <el-button type="danger" :disabled="submitting" @click="confirm"
+          >确认</el-button
+        >
       </div>
     </el-dialog>
     <el-dialog :title="'库存管理'" :visible.sync="stockShow" center="true">
@@ -20,8 +24,12 @@
         ></el-input-number>
       </div>
       <div slot="footer" class="dialog-foot">
-        <el-button @click="stockShow = false">取消</el-button>
-        <el-button type="success" @click="confirm">确认</el-button>
+        <el-button :disabled="submitting" @click="stockShow = false"
+          >取消</el-button
+        >
+        <el-button type="success" :disabled="submitting" @click="confirm"
+          >确认</el-button
+        >
       </div>
     </el-dialog>
     <el-dialog
@@ -35,8 +43,12 @@
         ref="form"
       ></common-form>
       <div slot="footer" class="dialog-foot">
-        <el-button @click="isShow = false">取消</el-button>
-        <el-button type="primary" @click="confirm">确认</el-button>
+        <el-button :disabled="submitting" @click="isShow = false"
+          >取消</el-button
+        >
+        <el-button type="primary" :disabled="submitting" @click="confirm"
+          >确认</el-button
+        >
       </div>
     </el-dialog>
     <el-dialog :title="'分组命名'" :visible.sync="groupShow" center="true">
@@ -47,13 +59,18 @@
         ref="form"
       ></common-form>
       <div slot="footer" class="dialog-foot">
-        <el-button @click="groupShow = false">取消</el-button>
-        <el-button type="success" @click="confirm">确认</el-button>
+        <el-button :disabled="submitting" @click="groupShow = false"
+          >取消</el-button
+        >
+        <el-button type="success" :disabled="submitting" @click="confirm"
+          >确认</el-button
+        >
       </div>
     </el-dialog>
     <div class="manager-header">
       <div>
         <el-button
+          :disabled="submitting"
           type="success"
           size="medium"
           style="margin-bottom: 20px"
@@ -62,6 +79,7 @@
           >新增项目</el-button
         >
         <el-button
+          :disabled="submitting"
           type="primary"
           size="medium"
           style="margin-bottom: 20px"
@@ -79,6 +97,7 @@
       </common-form>
     </div>
     <common-table
+      v-loading="submitting"
       :tableData="tableData"
       :tableLabel="tableLabel"
       :config="config"
@@ -217,6 +236,7 @@ export default {
       } else if (this.operateType === "groupEdit") {
         this.editGroupList();
       }
+      this.$store.commit("submit");
       this.isShow = false;
       this.groupShow = false;
       this.stockShow = false;
@@ -268,8 +288,10 @@ export default {
           } else {
             this.$message.error("添加失败！");
           }
+          this.$store.commit("finish");
         })
         .catch((err) => {
+          this.$store.commit("finish");
           this.$message.error("添加失败！");
           console.log(err, "错误");
         });
@@ -287,8 +309,10 @@ export default {
           } else {
             this.$message.error("修改失败！");
           }
+          this.$store.commit("finish");
         })
         .catch((err) => {
+          this.$store.commit("finish");
           this.$message.error("修改失败！");
           console.log(err, "错误");
         });
@@ -305,8 +329,10 @@ export default {
           } else {
             this.$message.error("删除失败！");
           }
+          this.$store.commit("finish");
         })
         .catch((err) => {
+          this.$store.commit("finish");
           this.$message.error("删除失败！");
           console.log(err, "错误");
         });
@@ -324,8 +350,10 @@ export default {
           } else {
             this.$message.error("入库失败！");
           }
+          this.$store.commit("finish");
         })
         .catch((err) => {
+          this.$store.commit("finish");
           this.$message.error("入库失败！");
           console.log(err, "错误");
         });
@@ -344,8 +372,10 @@ export default {
           } else {
             this.$message.error("出库失败！");
           }
+          this.$store.commit("finish");
         })
         .catch((err) => {
+          this.$store.commit("finish");
           this.$message.error("出库失败！");
           console.log(err, "错误");
         });
@@ -364,8 +394,10 @@ export default {
           } else {
             this.$message.warning("分组命名修改失败!");
           }
+          this.$store.commit("finish");
         })
         .catch((err) => {
+          this.$store.commit("finish");
           this.$message.warning("分组命名修改失败!");
         });
     },
@@ -434,6 +466,9 @@ export default {
           ],
         },
       ];
+    },
+    submitting() {
+      return this.$store.state.form.submitting;
     },
   },
 };

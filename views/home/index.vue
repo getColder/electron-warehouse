@@ -93,7 +93,7 @@
 
 
 <script>
-import { getData, getGroup } from "../../api/data.js";
+import { getData, getGroup, getStockListByLatest } from "../../api/data.js";
 import * as echarts from "echarts";
 
 export default {
@@ -108,33 +108,11 @@ export default {
         pcs: "单位",
         group: "分组",
       },
-      itemStockData: [
-        {
-          date: "2022/4/1",
-          in: "40",
-          out: "0",
-        },
-        {
-          date: "2022/4/2",
-          in: "30",
-          out: "10",
-        },
-        {
-          date: "2022/4/3",
-          in: "30",
-          out: "50",
-        },
-        {
-          date: "2022/4/4",
-          in: "10",
-          out: "10",
-        },
-        {
-          date: "2022/4/5",
-          in: "0",
-          out: "20",
-        },
-      ],
+      itemStockData: {
+        date: ["2022/4/1", "", "", "2022/4/4", "", "", "2022/4/7"],
+        in: [30, 60, 40, 30, 30, 60, 70],
+        out: [40, 30, 30, 60, 30, 60, 20],
+      },
     };
   },
   mounted() {
@@ -244,40 +222,50 @@ export default {
         D.setOption(itemDistributionOption);
       }
     });
-    const itemStockOption = {
-      tooltip: {
-        trigger: "axis",
-      },
-      xAxis: {
-        type: "category",
-        data: this.itemStockData.date,
-        axisLine: {
-          lineStyle: {
-            color: "#ff2510",
-          },
-        },
-        axisLabel: {
-          interval: 0,
-          color: "#333",
-        },
-      },
-      yAxis: {},
-      series: [
-        {
-          name: "入库",
-          data: this.itemStockData.in,
-          type: "line",
-        },
-        {
-          name: "出库",
-          data: this.itemStockData.out,
-          type: "line",
-        },
-      ],
-    };
     //展示出入库-折线图
-    const S = echarts.init(this.$refs.itemStockChart);
-    S.setOption(itemStockOption);
+    getStockListByLatest().then((res) => {
+      const { code, data } = res.data;
+      if (code === 20000) {
+        this.itemStockData.in = data.in;
+        this.itemStockData.out = data.out;
+        const itemStockOption = {
+          tooltip: {
+            trigger: "axis",
+          },
+          legend: {
+            orient: "vertical",
+            x: "right", 
+            y: "top", 
+            data: ["出库", "入库"],
+          },
+          xAxis: {
+            type: "category",
+            data: this.itemStockData.date,
+            axisLabel: {
+              showMinLabel: true,
+              showMaxLabel: true,
+              interval: Math.floor(this.itemStockData.date.length / 2) - 1,
+              color: "#222",
+            },
+          },
+          yAxis: {},
+          series: [
+            {
+              name: "入库",
+              data: this.itemStockData.in,
+              type: "line",
+            },
+            {
+              name: "出库",
+              data: this.itemStockData.out,
+              type: "line",
+            },
+          ],
+        };
+        const S = echarts.init(this.$refs.itemStockChart);
+        S.setOption(itemStockOption);
+      }
+    });
   },
   computed: {
     itemGroupData() {

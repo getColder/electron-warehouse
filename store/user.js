@@ -1,6 +1,6 @@
 export default {
     state: {
-        token: ""
+        token: undefined
     },
     mutations: {
         setToken(state, val) {

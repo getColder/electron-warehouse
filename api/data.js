@@ -84,3 +84,20 @@ export const stockOutItem = (param) => {
         headers: { 'Authorization': localStorage.getItem('very') }
     })
 }
+
+export const getStockListByDate = (param) => {
+    return axios.request({
+        url: '/stock-record/get-list-by-date',
+        method: "post",
+        data: param,
+        headers: { 'Authorization': localStorage.getItem('very') }
+    })
+}
+
+export const getStockListByLatest = () => {
+    return axios.request({
+        url: '/stock-record/get-list-by-latest?drange=7',
+        method: "get",
+        headers: { 'Authorization': localStorage.getItem('very') }
+    })
+}
