@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave:true,
-  outputDir: "../warehouse-server/warehouse-server/public",
+  outputDir: "../warehouse-server/public",
   configureWebpack: config => ({
       
   })
