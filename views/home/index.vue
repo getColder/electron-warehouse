@@ -1,7 +1,7 @@
-<template>
+<template slot-scope>
     <div>
-        <el-row class="home" :gutter="20">
-            <el-col :span="5">
+        <el-row :gutter="20">
+            <el-col :span="5" class="home hidden-xs-only">
                 <el-card class="user-card" shadow="hover">
                     <div class="user" slot="header">
                         <img width="125px" height="125px" :src="userImg" />
@@ -16,13 +16,29 @@
                     </div>
                 </el-card>
             </el-col>
-            <el-col :span="19">
+            <el-col :xs="22" :span="19">
                 <div class="search-bar">
-                    <el-input style="width: 92%" size="mini"></el-input>
-                    <el-button type="primary" size="mini">搜索</el-button>
+                    <el-input
+                        v-model="filterStr"
+                        style="margin-left: 1rem; width: 50vw"
+                    ></el-input>
+                    <el-button
+                        type="primary"
+                        style="margin: 0 1rem"
+                        size="mini"
+                    >
+                        搜索</el-button
+                    >
                 </div>
                 <el-card class="data-card">
-                    <el-table :data="tableData" max-height="330px">
+                    <el-table
+                        :data="
+                            tableData.filter((value) => {
+                                return filterRegx.test(value.name);
+                            })
+                        "
+                        max-height="70%"
+                    >
                         <el-table-column
                             v-for="(val, key) in tableLabel"
                             :key="key"
@@ -34,12 +50,12 @@
             </el-col>
         </el-row>
         <el-row class="info" :gutter="0">
-            <el-col :span="8">
+            <el-col :xs="24" :span="7">
                 <el-card shadow="hover">
                     <div class="item-group-graph" ref="itemGroupChart"></div>
                 </el-card>
             </el-col>
-            <el-col :span="7">
+            <el-col :xs="24" :span="7">
                 <el-card shadow="hover">
                     <div
                         class="item-group-d-graph"
@@ -47,7 +63,7 @@
                     ></div>
                 </el-card>
             </el-col>
-            <el-col :span="9">
+            <el-col :xs="24" :span="9">
                 <el-card shadow="hover">
                     <div class="item-stock-graph" ref="itemStockChart"></div>
                 </el-card>
@@ -79,10 +95,10 @@
     .search-bar {
         display: flex;
         justify-content: space-between;
-        padding: 0 0px;
+        padding: 0 0;
     }
     .data-card {
-        margin-top: 12px;
+        margin-top: 1rem;
     }
 }
 .info {
@@ -98,7 +114,7 @@
 <script>
 import { getData, getGroup, getStockListByLatest } from "../../api/data.js";
 import * as echarts from "echarts";
-import {generatorDay} from "../../src/utils/dateManage";
+import { generatorDay } from "../../src/utils/dateManage";
 
 export default {
     name: "home",
@@ -113,10 +129,10 @@ export default {
                 group: "分组",
             },
             today: new Date(),
+            filterStr: "",
         };
     },
     mounted() {
-        let a = new Array(...generatorDay(this.today, 6));
         getData()
             .then((res) => {
                 const { code, data } = res.data;
@@ -134,6 +150,15 @@ export default {
                 this.$store.commit("getGroup", data.info);
                 //展示分组-柱状图
                 const itemGroupOption = {
+                    title: {
+                        text: "物品统计",
+                        x: "center",
+                        y: "93%",
+                        textStyle: {
+                            fontSize: 14,
+                            fontWeight: "bold",
+                        },
+                    },
                     grid: {
                         left: "10%",
                     },
@@ -173,7 +198,7 @@ export default {
                             name: "分组数量",
                             data: this.itemGroupData.map((item) => {
                                 return {
-                                    value: item.number,
+                                    value: item.number.amount,
                                     itemStyle: {
                                         color: item.color,
                                     },
@@ -193,6 +218,15 @@ export default {
                 };
                 //展示分布-饼状图
                 const itemDistributionOption = {
+                    title: {
+                        text: "分组统计",
+                        x: "center",
+                        y: "93%",
+                        textStyle: {
+                            fontSize: 14,
+                            fontWeight: "bold",
+                        },
+                    },
                     tooltip: {
                         trigger: "item",
                     },
@@ -202,7 +236,7 @@ export default {
                             data: this.itemGroupData.map((item) => {
                                 return {
                                     name: item.group,
-                                    value: item.number,
+                                    value: item.number.total,
                                 };
                             }),
                             type: "pie",
@@ -229,6 +263,15 @@ export default {
             if (code === 20000) {
                 this.$store.commit("getStock7", data);
                 const itemStockOption = {
+                    title: {
+                        text: "出入库统计",
+                        x: "center",
+                        y: "93%",
+                        textStyle: {
+                            fontSize: 14,
+                            fontWeight: "bold",
+                        },
+                    },
                     tooltip: {
                         trigger: "axis",
                     },
@@ -254,11 +297,13 @@ export default {
                             name: "入库",
                             data: this.itemStockData.in,
                             type: "line",
+                            color: "#d34040",
                         },
                         {
                             name: "出库",
                             data: this.itemStockData.out,
                             type: "line",
+                            color: "#40d340",
                         },
                     ],
                 };
@@ -305,9 +350,16 @@ export default {
                 out: this.$store.state.stock.stockData7.out,
             };
         },
-        day7Latest(){
-            return Array.from(generatorDay(this.today, 7))
-        }
+        day7Latest() {
+            return Array.from(generatorDay(this.today, 7));
+        },
+        filterRegx() {
+            return new RegExp(
+                `${this.filterStr === "" ? "." : this.filterStr}`,
+                "gi"
+            );
+        },
     },
+    methods: {},
 };
 </script>
